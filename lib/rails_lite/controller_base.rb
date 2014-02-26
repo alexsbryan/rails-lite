@@ -26,6 +26,7 @@ class ControllerBase
     raise "You can't double render" if @already_built_response
      # @session.store_session(@res)
     @already_built_response = true
+     @session.store_session(@res) if @session
   end
 
   # helper method to alias @already_rendered
@@ -40,8 +41,8 @@ class ControllerBase
     @res["location"] =  url
     # @res.set_redirect(302, url)
     raise "You can't double render" if @already_built_response
-    # @session.store_session(@res)
     @already_built_response = true
+      @session.store_session(@res) if @session
   end
 
   # use ERB and binding to evaluate templates
@@ -59,5 +60,7 @@ class ControllerBase
 
   # use this with the router to call action_name (:index, :show, :create...)
   def invoke_action(name)
+    self.send(name)
+    self.render(name) unless already_rendered?
   end
 end
